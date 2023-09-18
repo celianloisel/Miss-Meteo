@@ -31,7 +31,7 @@ weather, Miss Meteo has you covered.
 
 ## Getting Started
 
-To run the Memory Game locally on your machine, follow these steps:
+To run Api locally on your machine, follow these steps:
 
 1. **Clone the Repository**
 
@@ -79,7 +79,7 @@ the [GitHub Issues page](https://github.com/celianloisel/Miss-Meteo/issues) of t
 
 ## Contributing
 
-Contributions to this Memory Game project are welcome! If you find any issues or have ideas for improvements, please
+Contributions to this Api project are welcome! If you find any issues or have ideas for improvements, please
 open an issue or submit a pull request.
 
 1. Fork the repository.
