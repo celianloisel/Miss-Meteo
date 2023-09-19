@@ -19,7 +19,7 @@ request_counter = {
 }
 
 
-@app.get("/weather")
+@app.get("/weather-by-date")
 async def get_weather_by_date(
     start_date: str = Query(..., description="Date de début"),
     end_date: str = Query(..., description="Date de fin")
@@ -29,7 +29,7 @@ async def get_weather_by_date(
     return filtered_data
 
 
-@app.get("/filter/precipitation")
+@app.get("/by-precipitation")
 async def filter_by_precipitation(
     min_precipitation: float = Query(..., description="Précipitation minimale"),
     max_precipitation: float = Query(..., description="Précipitation maximale")
@@ -39,7 +39,7 @@ async def filter_by_precipitation(
     return filtered_data
 
 
-@app.get("/filter/temperature")
+@app.get("/weather-by-temperature")
 async def filter_by_temperature(
     min_temperature: float = Query(..., description="Température minimale"),
     max_temperature: float = Query(..., description="Température maximale")
