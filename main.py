@@ -34,14 +34,23 @@ async def get_weather_by_date(
         List[dict]: Liste des données météorologiques dans la plage de dates spécifiée.
     """
     request_counter["get_weather_by_date"] += 1
-    filtered_data = [data for data in weather_data if start_date <= data["date"] <= end_date]
+    filtered_data = []
+
+    for data in weather_data:
+        if start_date <= data["date"] <= end_date:
+            filtered_data.append(data)
+
+    if not filtered_data:
+        raise HTTPException(
+            status_code=404, detail=f"Aucune donnée météorologique trouvée pour la plage de dates spécifiée.")
     return filtered_data
 
 
 @app.get("/weather-by-precipitation")
 async def filter_by_precipitation(
-        min_precipitation: float = Query(..., description="Précipitation minimale"),
-        max_precipitation: float = Query(..., description="Précipitation maximale")
+    min_precipitation: float = Query(...,
+                                     description="Précipitation minimale"),
+    max_precipitation: float = Query(..., description="Précipitation maximale")
 ) -> List[dict]:
     """
     Filtre les données météorologiques par plage de précipitations.
@@ -54,14 +63,23 @@ async def filter_by_precipitation(
         List[dict]: Liste des données météorologiques dans la plage de précipitations spécifiée.
     """
     request_counter["filter_by_precipitation"] += 1
-    filtered_data = [data for data in weather_data if min_precipitation <= data["prcp"] <= max_precipitation]
+    filtered_data = []
+
+    for data in weather_data:
+        if min_precipitation <= data["prcp"] <= max_precipitation:
+            filtered_data.append(data)
+
+    if not filtered_data:
+        raise HTTPException(
+            status_code=404, detail=f"Aucune donnée météorologique trouvée pour la plage de précipitations spécifiée.")
+
     return filtered_data
 
 
 @app.get("/weather-by-temperature")
 async def filter_by_temperature(
-        min_temperature: float = Query(..., description="Température minimale"),
-        max_temperature: float = Query(..., description="Température maximale")
+    min_temperature: float = Query(..., description="Température minimale"),
+    max_temperature: float = Query(..., description="Température maximale")
 ) -> List[dict]:
     """
     Filtre les données météorologiques par plage de températures.
@@ -74,7 +92,16 @@ async def filter_by_temperature(
         List[dict]: Liste des données météorologiques dans la plage de températures spécifiée.
     """
     request_counter["filter_by_temperature"] += 1
-    filtered_data = [data for data in weather_data if min_temperature <= data["tmin"] <= max_temperature]
+    filtered_data = []
+
+    for data in weather_data:
+        if min_temperature <= data["tmin"] <= max_temperature:
+            filtered_data.append(data)
+
+    if not filtered_data:
+        raise HTTPException(
+            status_code=404, detail=f"Aucune donnée météorologique trouvée pour la plage de températures spécifiée.")
+
     return filtered_data
 
 
@@ -93,7 +120,7 @@ async def add_date(date: str, tmin: float, tmax: float, prcp: float, snow: float
         awnd (float): Vitesse du vent moyen.
 
     Returns:
-        dict: Message de confirmation.
+        dict: Message de confirmation ou d'erreur.
     """
     request_counter["add_date"] += 1
     new_entry = {
@@ -105,10 +132,19 @@ async def add_date(date: str, tmin: float, tmax: float, prcp: float, snow: float
         "snwd": snwd,
         "awnd": awnd
     }
-    weather_data.append(new_entry)
-    with open("rdu-weather-history.json", "w") as file:
-        json.dump(weather_data, file, indent=4)
-    return {"message": "Données ajoutées avec succès"}
+
+    try:
+        # Ajouter la nouvelle entrée aux données météorologiques
+        weather_data.append(new_entry)
+
+        # Sauvegarder les données mises à jour dans le fichier JSON
+        with open("rdu-weather-history.json", "w") as file:
+            json.dump(weather_data, file, indent=4)
+
+        return {"message": "Données ajoutées avec succès"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Erreur lors de l'ajout des données : {str(e)}")
 
 
 @app.delete("/delete-date")
@@ -129,7 +165,8 @@ async def delete_date(date: str):
             with open("rdu-weather-history.json", "w") as file:
                 json.dump(weather_data, file, indent=4)
             return {"message": f"Données pour la date {date} supprimées avec succès"}
-    raise HTTPException(status_code=404, detail=f"Données pour la date {date} non trouvées")
+    raise HTTPException(
+        status_code=404, detail=f"Données pour la date {date} non trouvées")
 
 
 @app.put("/update-date")
@@ -181,7 +218,8 @@ async def update_date(
     if updated:
         return {"message": f"Données pour la date {date} mises à jour avec succès"}
     else:
-        raise HTTPException(status_code=404, detail=f"Données pour la date {date} non trouvées")
+        raise HTTPException(
+            status_code=404, detail=f"Données pour la date {date} non trouvées")
 
 
 @app.get("/request-count")
@@ -192,7 +230,12 @@ async def get_request_count():
     Returns:
         dict: Compteur de requêtes pour chaque endpoint.
     """
-    return request_counter
+    try:
+        return request_counter
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Erreur lors de la récupération du compteur de requêtes : {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn
