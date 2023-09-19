@@ -39,7 +39,7 @@ async def get_weather_by_date(
     return filtered_data
 
 
-@app.get("/by-precipitation")
+@app.get("/weather-by-precipitation")
 async def filter_by_precipitation(
         min_precipitation: float = Query(..., description="Précipitation minimale"),
         max_precipitation: float = Query(..., description="Précipitation maximale")
@@ -79,7 +79,7 @@ async def filter_by_temperature(
     return filtered_data
 
 
-@app.post("/add_date")
+@app.post("/add-date")
 async def add_date(date: str, tmin: float, tmax: float, prcp: float, snow: float, snwd: float, awnd: float):
     """
     Ajoute de nouvelles données météorologiques pour une date spécifiée.
@@ -112,7 +112,7 @@ async def add_date(date: str, tmin: float, tmax: float, prcp: float, snow: float
     return {"message": "Données ajoutées avec succès"}
 
 
-@app.delete("/delete_date")
+@app.delete("/delete-date")
 async def delete_date(date: str):
     """
     Supprime les données météorologiques pour une date spécifiée.
@@ -133,7 +133,7 @@ async def delete_date(date: str):
     raise HTTPException(status_code=404, detail=f"Données pour la date {date} non trouvées")
 
 
-@app.put("/update_date")
+@app.put("/update-date")
 async def update_date(
         date: str,
         tmin: Optional[float] = None,
@@ -185,7 +185,7 @@ async def update_date(
         raise HTTPException(status_code=404, detail=f"Données pour la date {date} non trouvées")
 
 
-@app.get("/request_count")
+@app.get("/request-count")
 async def get_request_count():
     """
     Récupère le compteur de requêtes pour chaque endpoint.
@@ -194,18 +194,6 @@ async def get_request_count():
         dict: Compteur de requêtes pour chaque endpoint.
     """
     return request_counter
-
-
-@app.get("/docs")
-async def get_swagger():
-    """
-    Affiche la documentation Swagger de l'API.
-
-    Returns:
-        HTMLResponse: Page HTML de la documentation Swagger.
-    """
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="API Documentation")
-
 
 if __name__ == "__main__":
     import uvicorn
